@@ -18,7 +18,7 @@ def semantic_split(markdown):
             continue
         cursor += len(line)
         kind_of_line = resolve_kind(line)
-        if kind_of_line != "title":
+        if kind_of_line not in ["title", "divider"]:
             content_buffer.append(line)
 
         if kind_of_line:
@@ -88,7 +88,7 @@ def agg_section(last_pos, title_to_aggregate, content_to_aggregate):
     return {
         "pos": last_pos,
         "title": ".".join(title_to_aggregate),
-        "content": "\n---\n".join(content_to_aggregate)
+        "content": "\n".join(content_to_aggregate)
     }
 
 
@@ -149,6 +149,22 @@ def clean(sections, resp_clean_sections):
         cleaned_sections.append({**section, "title": clean_title})
 
     return cleaned_sections
+
+
+MAX_TITLE_LENGTH = 100
+MAX_TITLE_SEEK_DISTANCE = 20
+
+
+def content_to_estimate(section):
+    if not section["title"]:
+        return section["content"]
+    split_pos = find_nearest_split(
+        section["title"],
+        max_length=MAX_TITLE_LENGTH,
+        max_seek_distance=MAX_TITLE_SEEK_DISTANCE
+    )
+    adapted_title = section["title"][0:split_pos]
+    return adapted_title + "\n\n" + section["content"]
 
 
 def summarize_tasks(tasks_single_str):

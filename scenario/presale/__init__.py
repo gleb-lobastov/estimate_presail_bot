@@ -1,12 +1,22 @@
 from aiogram import F, types
 
+from functools import reduce
+
 from utils.prompts import Prompts
 from utils.errors import BotError
 from utils.readers import read_md, read_pdf
 from utils.format import russian_plural
 from services.gpt import gpt_controller
 
-from .transform import semantic_split, prepare_for_clean_prompt, clean, aggregate, disaggregate, summarize_tasks
+from .transform import (
+    semantic_split,
+    prepare_for_clean_prompt,
+    clean,
+    aggregate,
+    disaggregate,
+    summarize_tasks,
+    content_to_estimate
+)
 
 MAX_SECTIONS_COUNT = 7
 # fixme: применены фильтры из aiogramm, а сценарии не должны зависеть от типа бота
@@ -59,8 +69,9 @@ async def scenario_presale(message):
             raw_document = user_input.text
 
         sections = semantic_split(raw_document)
+        titles_count = reduce(lambda count, section: count + 1 if section["title"] else count, sections, 0)
 
-        if len(sections) > 1:
+        if titles_count > 1:
             await message.answer("Выполняется запрос на уточнение структуры документа")
             prompt = prompts["clean_titles"].exec(prepare_for_clean_prompt(sections))
             resp_clean_titles = await gpt.prompt(prompt) or (yield TEXT_INPUT_TYPE).text
@@ -81,8 +92,8 @@ async def scenario_presale(message):
         for section in sections:
             if not any(char.isalpha() for char in section["content"]):
                 continue
-            prompt = prompts["evaluate_section"].exec(section["content"])
-            await message.answer(f'Выполняется запрос для раздела/разделов: {section["title"]}\n')
+            prompt = prompts["evaluate_section"].exec(content_to_estimate(section))
+            await message.answer(f'Выполняется запрос для раздела/разделов: {section["title"] or "Без заголовка"}\n')
             resp_evaluated_tasks = await gpt.prompt(prompt) or (yield TEXT_INPUT_TYPE).text
             await message.answer(f'Задачи: {resp_evaluated_tasks}')
 
