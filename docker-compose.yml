@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  python-app:
+    container_name: estimate-bot
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      BOT_TOKEN: ${BOT_TOKEN}
+      OPENAI_TOKEN: ${OPENAI_TOKEN}
+      GIGACHAT_TOKEN: ${GIGACHAT_TOKEN}
