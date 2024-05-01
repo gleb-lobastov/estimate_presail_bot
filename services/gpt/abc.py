@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 import aiohttp
 
+from .consts import DEFAULT_SYSTEM_MESSAGE
+
 
 class AbstractGPT(ABC):
     """
@@ -16,9 +18,16 @@ class AbstractGPT(ABC):
 
     """
     SESSION_REQUIRED = True
+    _system_message = DEFAULT_SYSTEM_MESSAGE
 
-    def __init__(self) -> None:
+    @property
+    def system_message(self):
+        return self._system_message
+
+    def __init__(self, *, system_message="", **kwargs) -> None:
         self._session = aiohttp.ClientSession() if type(self).SESSION_REQUIRED else None
+        if system_message:
+            self._system_message = system_message
 
     async def __aenter__(self):
         return self

@@ -1,14 +1,13 @@
 from openai import OpenAI
 from config import OPENAI_TOKEN
 from ..abc import AbstractGPT
-from ..consts import SYSTEM_MESSAGE
 
 
 class OpenAIChatGPT(AbstractGPT):
     SESSION_REQUIRED = False
 
     def __init__(self, *, model="gpt-3.5-turbo-16k", **kwargs):
-        super().__init__()
+        super().__init__(**kwargs)
         self._model = model
         self._client = OpenAI(api_key=OPENAI_TOKEN)
 
@@ -17,7 +16,7 @@ class OpenAIChatGPT(AbstractGPT):
             model=self._model,
             temperature=0.3,
             messages=[
-                {"role": "system", "content": SYSTEM_MESSAGE},
+                {"role": "system", "content": self._system_message},
                 {"role": "user", "content": text}
             ]
         )

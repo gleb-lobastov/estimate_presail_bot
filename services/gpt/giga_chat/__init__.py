@@ -1,7 +1,6 @@
 from uuid import uuid4
 from config import GIGACHAT_TOKEN
 from ..abc import AbstractGPT
-from ..consts import SYSTEM_MESSAGE
 
 SCOPE = "GIGACHAT_API_PERS"
 OAUTH_URL = "https://ngw.devices.sberbank.ru:9443/api/v2/oauth"
@@ -10,7 +9,7 @@ API_URL = "https://gigachat.devices.sberbank.ru/api/v1/chat/completions"
 
 class GigaChatGPT(AbstractGPT):
     def __init__(self, **kwargs):
-        super().__init__()
+        super().__init__(**kwargs)
         self._token = None
 
     async def get_token(self):
@@ -46,7 +45,7 @@ class GigaChatGPT(AbstractGPT):
         data = {
             "model": "GigaChat:latest",
             "messages": [
-                {"role": "system", "content": SYSTEM_MESSAGE},
+                {"role": "system", "content": self._system_message},
                 {"role": "user", "content": text},
             ],
             "temperature": 0.7

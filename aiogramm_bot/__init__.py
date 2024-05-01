@@ -1,9 +1,11 @@
 from aiogram import Dispatcher
-from aiogram import types
+from aiogram import types, F
 from aiogram.filters import CommandStart, Command
 
-from scenario import scenario_presale, scenario_set_gpt
+from scenario import scenario_presale, scenario_set_gpt, scenario_talk
 from utils.errors import BotError, handle_errors
+
+from config import ADMIN_ID
 
 from .classes import AiogramScenarioRunner
 from .bot import bot
@@ -19,6 +21,22 @@ async def start_polling():
 @dp.message(CommandStart())
 async def command_start(message: types.Message):
     await message.reply("Для начала работы вызовите команду estimate и следуйте инструкциям")
+
+
+@dp.message(Command("talk"), F.from_user.id == ADMIN_ID)
+@handle_errors
+async def command_talk(message: types.Message):
+    """
+    Команда переключает бота в режим общения с ChatGPT
+    Доступна только админу :)
+
+    Args:
+        message (types.Message): Сообщение пользователя
+
+    Returns:
+        None
+    """
+    await scenario.play(scenario_talk, message)
 
 
 @dp.message(Command("select_llm_model"))
