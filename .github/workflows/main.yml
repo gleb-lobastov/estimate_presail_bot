@@ -13,6 +13,7 @@ jobs:
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
       OPENAI_TOKEN: ${{ secrets.OPENAI_TOKEN }}
       GIGACHAT_TOKEN: ${{ secrets.GIGACHAT_TOKEN }}
+      ADMIN_ID: ${{ secrets.ADMIN_ID }}
 
     steps:
       - name: Checkout
