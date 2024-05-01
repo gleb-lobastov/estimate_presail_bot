@@ -5,7 +5,7 @@ from aiogram.filters import CommandStart, Command
 from scenario import scenario_presale, scenario_set_gpt, scenario_talk
 from utils.errors import BotError, handle_errors
 
-from config import ADMIN_ID
+from config import ADMIN_IDS
 
 from .classes import AiogramScenarioRunner
 from .bot import bot
@@ -23,7 +23,7 @@ async def command_start(message: types.Message):
     await message.reply("Для начала работы вызовите команду estimate и следуйте инструкциям")
 
 
-@dp.message(Command("talk"), F.from_user.id == ADMIN_ID)
+@dp.message(Command("talk"), F.from_user.id.in_(ADMIN_IDS))
 @handle_errors
 async def command_talk(message: types.Message):
     """

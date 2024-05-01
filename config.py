@@ -9,6 +9,6 @@ GIGACHAT_TOKEN = os.getenv('GIGACHAT_TOKEN')
 
 # noinspection PyBroadException
 try:
-    ADMIN_ID = int(os.getenv('ADMIN_ID'))
+    ADMIN_IDS = {int(admin_id) for admin_id in os.getenv('ADMIN_ID').split(",")}
 except Exception:
-    ADMIN_ID = 0
+    ADMIN_IDS = set()
